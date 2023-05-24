@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nationalize</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+</head>
+<body>
+  <section class="vh-100" style="background-color: #e2d5de;">
+    <div class="container py-5 h-100">
+      <div class="card" style="border-radius: 15px;">
+        <div class="card-body p-5">
+          <h1>Nationalize By Name</h1>
+          <form class="d-flex justify-content-center align-items-start mb-4" id="check-form" autocomplete="off">
+            <div class="form-outline flex-fill">
+              <input type="text" id="check-name" class="form-control form-control-lg" />
+              <label class="form-label" for="form3">Please enter the name</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg ms-2">Check</button>
+          </form>
+          <div class="row" id="result-container"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const fetchNationalize = (name) => {
+      fetch('https://api.nationalize.io?name=' + name, {
+        method: 'GET'
+      }).then(response => response.json())
+        .then(data => buildNationalizeList(data.country))
+        .catch(err => console.error(err))
+    }
+
+    const buildNationalizeList = (countries) => {
+      console.info(countries)
+      const container = document.getElementById('result-container')
+      container.innerHTML = ''
+      countries.forEach(country => {
+        const countryDiv = document.createElement('div')
+        countryDiv.classList.add('col-4', 'text-center')
+        countryDiv.innerHTML = `
+            <image src="https://flagcdn.com/256x192/${country.country_id.toLowerCase()}.png" width="256" height="192" alt="${country.country_id}.png" onerror="javascript:this.src='missing.png'" />
+            <h3>${(country.probability * 100).toFixed(2)}%</h3>
+        `
+        container.appendChild(countryDiv)
+      });
+    }
+
+    const checkForm = document.getElementById('check-form')
+    checkForm.addEventListener('submit', event => {
+      event.preventDefault()
+      const nameElement = document.getElementById('check-name')
+      fetchNationalize(nameElement.value)
+    })
+  </script>
+</body>
+</html>
